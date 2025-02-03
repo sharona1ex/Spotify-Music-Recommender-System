@@ -48,7 +48,7 @@ COPY ./app /code/app
 
 
 # Add PAT environment variable
-ENV AZURE_DATABRICKS_PAT=dapibbf49db5b24a500723a63523a96523da-3
+ENV AZURE_DATABRICKS_PAT=<insert databricks token>
 
 
 # Tell uvicorn to start spin up our code, which will be running inside the container now

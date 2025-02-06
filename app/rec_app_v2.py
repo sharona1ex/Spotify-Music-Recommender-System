@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import requests
 from collections import OrderedDict
+import time
 
 
 HOSTNAME = "http://localhost:80/"
@@ -72,6 +73,7 @@ def get_full_detail_from_uris(uri_list):
         df = pd.DataFrame(data)
         return df
     else:
+        print(f"get_full_detail_from_uris failed with response {response.status_code}")
         return None
 
 
@@ -187,8 +189,10 @@ def get_song_uri_from_pills():
 #     {"title": "Cruel Summer", "artist": "Taylor Swift", "album": "Lover"},
 #     {"title": "Bad Guy", "artist": "Billie Eilish", "album": "When We All Fall Asleep, Where Do We Go?"}
 # ]
-songs = get_all_songs()
-songs_df = pd.DataFrame(songs)
+
+if not st.session_state["retain_state"]:
+    songs = get_all_songs()
+    songs_df = pd.DataFrame(songs)
 
 
 # Create columns for logo and title
@@ -199,7 +203,7 @@ with logo_col:
     st.image("https://storage.googleapis.com/pr-newsroom-wp/1/2023/05/Spotify_Primary_Logo_RGB_Green.png", width=100)  # Adjust width as needed
 with title_col:
     # Title
-    st.title("Music Recommendation App")
+    st.title("Loopify")
 
     # Subtitle
     st.markdown("""
@@ -210,7 +214,7 @@ with title_col:
             margin-bottom: 2em;
         }
         </style>
-        <div class="subtitle">Find and discover music recommendations</div>
+        <div class="subtitle">Find your vibe with loopify music recommendation.</div>
     """, unsafe_allow_html=True)
 
 # Replace the single search bar with multiple search fields in a row
@@ -229,7 +233,9 @@ with col4:
 # Filter logic when search button is pressed
 # st.write(st.session_state["retain_state"])
 if not(st.session_state["retain_state"]):
+    print("1")
     if search_button and (search_name or search_artist or search_album):
+        print("1.2")
         print(">" + search_name + "<")
         print(not(search_name))
         # searchfun(search_name)
@@ -240,14 +246,20 @@ if not(st.session_state["retain_state"]):
         # ]
         filtered_df = searchfun(search_name, search_artist, search_album)
     else:
+        print("1.3")
         filtered_df = songs_df
 
     if "complete_set" not in st.session_state:
+        print("1.4")
         st.session_state["complete_set"] = filtered_df
 else:
+    print("2")
     filtered_df = st.session_state["filtered_df"]
 
 # dataframe
+
+starttime = time.time()
+print("3")
 st.dataframe(
     filtered_df,
     use_container_width=True,
@@ -255,10 +267,13 @@ st.dataframe(
     on_select=callbackfun,
     selection_mode='single-row'
 )
+endtime = time.time()
+print("time:", endtime - starttime)
 
 if "input_songs" in st.session_state:
     print("herere...")
     selected_song_container = st.container(height=300)
+    starttime = time.time()
     with selected_song_container:
         list_of_songs = st.session_state["input_songs"].keys()
         selection = st.pills("Your songs", list_of_songs, selection_mode="multi", default=list_of_songs, key="song_pills")
@@ -271,3 +286,5 @@ if "input_songs" in st.session_state:
         st.button("Clear all", on_click=callbackfun3, use_container_width=True)
 
     recommendation_container = st.container()
+    endtime = time.time()
+    print("time:", endtime - starttime)

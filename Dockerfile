@@ -46,10 +46,5 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./app /code/app
 
 
-
-# Add PAT environment variable
-ENV AZURE_DATABRICKS_PAT=<insert databricks token>
-
-
 # Tell uvicorn to start spin up our code, which will be running inside the container now
 CMD [ "uvicorn", "app.connectASQL:app", "--host", "0.0.0.0", "--port", "80"]
